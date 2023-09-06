@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-//        CRETES SCREEN
+//        CREATES SCREEN
         JFrame  window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
