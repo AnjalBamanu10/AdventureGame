@@ -15,7 +15,10 @@ public class Player extends  Entity{
 
     public final int screenX;
     public final int screenY;
-    int hasKey = 0;
+    public int hasKey = 0;
+    int standCounter = 0;
+    boolean moving = false;
+    int pixelCounter = 0;
 
 
 
@@ -27,12 +30,12 @@ public class Player extends  Entity{
         screenY = gp.screenHeight/2 - (gp.tileSize/2);
 
         solidArea = new Rectangle();
-        solidArea.x = 5;
-        solidArea.y = 16;
+        solidArea.x = 1;
+        solidArea.y = 1;
         solidAreaDefaultX = solidArea.x;
         solidAreaDefaultY = solidArea.y;
-        solidArea.width = 32;
-        solidArea.height = 32;
+        solidArea.width = 46;
+        solidArea.height = 46;
 
         setDefaultValues();
         getPlayerImage();
@@ -62,33 +65,42 @@ public class Player extends  Entity{
     }
 
     public void update(){
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
-            if(keyH.upPressed){
-                direction = "up";
+        if(moving == false) {
+            if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+                if (keyH.upPressed) {
+                    direction = "up";
 
-            }
-            else if(keyH.downPressed){
-                direction = "down";
+                } else if (keyH.downPressed) {
+                    direction = "down";
 
-            }
-            else if(keyH.leftPressed){
-                direction = "left";
+                } else if (keyH.leftPressed) {
+                    direction = "left";
 
-            }
-            else if(keyH.rightPressed){
-                direction = "right";
+                } else if (keyH.rightPressed) {
+                    direction = "right";
 
-            }
+                }
+                moving = true;
 
 //            COLLISION
-            collisionOn = false;
-            gp.cChecker.checkTile(this);
+                collisionOn = false;
+                gp.cChecker.checkTile(this);
 
 //            CHECK OBJECT COLLISION
-            int objIndex = gp.cChecker.checkObject(this, true);
-            pickUpObject(objIndex);
+                int objIndex = gp.cChecker.checkObject(this, true);
+                pickUpObject(objIndex);
 
 
+            } else {
+                standCounter++;
+                if (standCounter == 20) {
+                    spriteNum = 1;
+                    standCounter = 0;
+                }
+
+            }
+        }
+        if(moving == true){
 //            IF COLLISION IS FALSE PLAYER CAN MOVE
             if(!collisionOn){
                 switch (direction) {
@@ -108,6 +120,11 @@ public class Player extends  Entity{
                 }
                 spriteCounter = 0;
             }
+            pixelCounter += speed;
+            if(pixelCounter == 48){
+                moving = false;
+                pixelCounter = 0;
+            }
         }
 
     }
@@ -120,18 +137,28 @@ public class Player extends  Entity{
                     gp.playSE(1);
                     hasKey++;
                     gp.obj[i] = null;
+                    gp.ui.showMessage("You got a Key!");
                     break;
                 case "Door":
                     if(hasKey > 0){
                         gp.playSE(3);
                         gp.obj[i] = null;
                         hasKey--;
+                        gp.ui.showMessage("You opened the door!");
+                    }else {
+                        gp.ui.showMessage("You will need a Key!");
                     }
                     break;
                 case "Boots":
                     gp.playSE(2);
                    speed +=  2;
                    gp.obj[i] = null;
+                   gp.ui.showMessage("Speed Up!");
+                    break;
+                case "Chest":
+                    gp.ui.gameFinished = true;
+                    gp.stopMusic();
+                    gp.playSE(4);
                     break;
             }
         }
@@ -176,5 +203,6 @@ public class Player extends  Entity{
         }
 
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+
     }
 }
