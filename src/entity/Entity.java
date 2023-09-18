@@ -23,15 +23,44 @@ public class Entity {
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean collisionOn = false;
     public int actionLockCounter = 0;
+    String[] dialogues = new String[20];
+    int dialogueIndex = 0;
+    private Rectangle bounds;
+    private int speedX;
+    private int speedY;
 
-
-    public Entity(GamePanel gp){
-        this.gp =gp;
+    public Entity(GamePanel gp) {
+        this.gp = gp;
     }
-    public  void setAction(){
 
+    public void setAction() {
     }
-    public void  update(){
+
+    public void speak() {
+        if(dialogues[dialogueIndex] == null){
+            dialogueIndex = 0;
+
+        }
+        gp.ui.currentDialogue = dialogues[dialogueIndex];
+        dialogueIndex++;
+
+        switch (gp.player.direction){
+            case "up":
+                direction = "down";
+                break;
+            case "down":
+                direction = "up";
+                break;
+            case "left":
+                direction = "right";
+                break;
+            case "right":
+                direction = "left";
+                break;
+        }
+    }
+
+    public void update() {
         setAction();
 
         collisionOn = false;
@@ -40,7 +69,7 @@ public class Entity {
         gp.cChecker.checkPlayer(this);
 
 //       IF COLLISION IS FALSE PLAYER CAN MOVE
-        if(!collisionOn){
+        if (!collisionOn) {
             switch (direction) {
                 case "up" -> worldY = worldY - speed;
                 case "down" -> worldY = worldY + speed;
@@ -50,10 +79,10 @@ public class Entity {
         }
 
         spriteCounter++;
-        if(spriteCounter > 12){
-            if(spriteNum == 1){
+        if (spriteCounter > 12) {
+            if (spriteNum == 1) {
                 spriteNum = 2;
-            }else if(spriteNum == 2){
+            } else if (spriteNum == 2) {
                 spriteNum = 1;
             }
             spriteCounter = 0;
@@ -61,13 +90,12 @@ public class Entity {
     }
 
 
-
-    public void draw(Graphics2D g2){
+    public void draw(Graphics2D g2) {
         BufferedImage image = null;
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
-        if(worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && worldX - gp.tileSize < gp.player.worldX + gp.player.screenX && worldY + gp.tileSize > gp.player.worldY - gp.player.screenY && worldY - gp.tileSize < gp.player.worldY + gp.player.screenY){
+        if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && worldX - gp.tileSize < gp.player.worldX + gp.player.screenX && worldY + gp.tileSize > gp.player.worldY - gp.player.screenY && worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
             switch (direction) {
                 case "up" -> {
                     if (spriteNum == 1) {
@@ -108,14 +136,15 @@ public class Entity {
 
         }
     }
-    public BufferedImage setup(String imagePath){
+
+    public BufferedImage setup(String imagePath) {
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
 
-        try{
+        try {
             image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(imagePath + ".png")));
             image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return image;

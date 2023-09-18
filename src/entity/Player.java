@@ -63,7 +63,7 @@ public class Player extends  Entity{
 
 
     public void update(){
-        if(moving == false) {
+        if(!moving) {
             if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
                 if (keyH.upPressed) {
                     direction = "up";
@@ -80,7 +80,7 @@ public class Player extends  Entity{
                 }
                 moving = true;
 
-//            COLLISION
+//          CHECK TILE  COLLISION
                 collisionOn = false;
                 gp.cChecker.checkTile(this);
 
@@ -93,7 +93,7 @@ public class Player extends  Entity{
                 interactNPC(npcIndex);
 
 
-            } else {
+             } else {
                 standCounter++;
                 if (standCounter == 20) {
                     spriteNum = 1;
@@ -102,7 +102,7 @@ public class Player extends  Entity{
 
             }
         }
-        if(moving == true){
+        if(moving){
 //            IF COLLISION IS FALSE PLAYER CAN MOVE
             if(!collisionOn){
                 switch (direction) {
@@ -138,8 +138,10 @@ public class Player extends  Entity{
     }
     public void interactNPC(int i){
         if(i != 999){
-            System.out.println("hit");
+                gp.gameState = gp.dialogueState;
+                gp.npc[i].speak();
         }
+
     }
 
     public void draw(Graphics2D g2){
